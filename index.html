@@ -1178,7 +1178,7 @@
     };
 
     const TYPE_IMAGES = {};
-    // 自动从 image_todo 目录按人格code索引图片
+    // 自动按人格code索引图片
     Object.keys(TYPE_LIBRARY).forEach(code => {
       const safeName = code.replace('!', '');
       // 尝试 png，fallback jpg
@@ -1566,14 +1566,14 @@
       const posterBox = document.getElementById('posterBox');
       const posterImage = document.getElementById('posterImage');
       const imageSrc = TYPE_IMAGES[type.code];
+      // 先清空旧图片，确保重测时刷新
+      posterImage.removeAttribute('src');
+      posterBox.classList.add('no-image');
       if (imageSrc) {
         posterImage.src = imageSrc;
         posterImage.alt = `${type.code}（${type.cn}）`;
-        posterBox.classList.remove('no-image');
-      } else {
-        posterImage.removeAttribute('src');
-        posterImage.alt = '';
-        posterBox.classList.add('no-image');
+        posterImage.onload = () => { posterBox.classList.remove('no-image'); };
+        posterImage.onerror = () => { posterBox.classList.add('no-image'); };
       }
 
       renderDimList(result);
