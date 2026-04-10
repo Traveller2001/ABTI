@@ -1385,8 +1385,11 @@
       `;
       questionList.appendChild(card);
 
+      let navigating = false;
+
       card.querySelectorAll('input[type="radio"]').forEach(input => {
         input.addEventListener('change', (e) => {
+          if (navigating) return;
           const { name, value } = e.target;
           app.answers[name] = Number(value);
 
@@ -1394,19 +1397,18 @@
             delete app.answers['quit_gate_q2'];
           }
 
-          // 自动跳转下一题，延迟一小段让用户看到选中状态
+          updateProgress();
+
+          // 自动跳转下一题，加锁防止快速点击
+          navigating = true;
           setTimeout(() => {
             const updatedVisible = getVisibleQuestions();
             if (app.currentIndex < updatedVisible.length - 1) {
               app.currentIndex++;
               renderCurrentQuestion();
-            } else {
-              // 最后一题，更新UI
-              updateProgress();
             }
-          }, 300);
-
-          updateProgress();
+            navigating = false;
+          }, 250);
         });
       });
 
