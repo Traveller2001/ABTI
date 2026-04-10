@@ -1386,6 +1386,23 @@
       `;
       questionList.appendChild(card);
 
+      // 如果当前题已答过且不是最后一题，显示"下一题"按钮
+      const visibleQs = getVisibleQuestions();
+      if (app.answers[q.id] !== undefined && index < visibleQs.length - 1) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn-secondary';
+        nextBtn.textContent = '下一题';
+        nextBtn.style.marginTop = '12px';
+        nextBtn.addEventListener('click', () => {
+          if (app.navigating) return;
+          app.navigating = true;
+          app.currentIndex++;
+          renderCurrentQuestion();
+          app.navigating = false;
+        });
+        questionList.appendChild(nextBtn);
+      }
+
       card.querySelectorAll('input[type="radio"]').forEach(input => {
         input.addEventListener('change', (e) => {
           if (app.navigating) return;
