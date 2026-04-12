@@ -606,7 +606,8 @@
         <h1>测测你的科研人格</h1>
         <div class="hero-actions hero-actions-single">
           <button id="startBtn" class="btn-primary">开始鉴定</button>
-          <!-- <button id="leaderboardBtn" class="btn-secondary">人格排行榜</button> -->
+          <button id="galleryBtn" class="btn-secondary">人格图鉴</button>
+          <button id="leaderboardBtn" class="btn-secondary">人格排行榜</button>
         </div>
         <div style="padding-top: 2rem; display: flex; flex-direction: column; color: var(--muted); font-size: 13px;">
           <span>ABTI - 科研人格鉴定</span>
@@ -680,7 +681,7 @@
         <div class="result-actions">
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <button id="restartBtn" class="btn-secondary">重新测试</button>
-            <!-- <button id="resultLeaderboardBtn" class="btn-secondary">人格排行榜</button> -->
+            <button id="resultLeaderboardBtn" class="btn-secondary">人格排行榜</button>
             <button id="toTopBtn" class="btn-primary">回到首页</button>
           </div>
         </div>
@@ -1656,15 +1657,18 @@
     }
 
     document.getElementById('startBtn').addEventListener('click', () => startTest(false));
-    // document.getElementById('leaderboardBtn').addEventListener('click', () => {
-    //   window.location.href = './leaderboard.html';
-    // });
+    document.getElementById('galleryBtn').addEventListener('click', () => {
+      window.location.href = './gallery.html';
+    });
+    document.getElementById('leaderboardBtn').addEventListener('click', () => {
+      window.location.href = './leaderboard.html';
+    });
     document.getElementById('backIntroBtn').addEventListener('click', () => showScreen('intro'));
     document.getElementById('submitBtn').addEventListener('click', renderResult);
     document.getElementById('restartBtn').addEventListener('click', () => startTest(false));
-    // document.getElementById('resultLeaderboardBtn').addEventListener('click', () => {
-    //   window.location.href = './leaderboard.html';
-    // });
+    document.getElementById('resultLeaderboardBtn').addEventListener('click', () => {
+      window.location.href = './leaderboard.html';
+    });
     document.getElementById('toTopBtn').addEventListener('click', () => showScreen('intro'));
     recordVisit();
   </script>

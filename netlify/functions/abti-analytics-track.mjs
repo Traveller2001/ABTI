@@ -1,45 +1,15 @@
 import { randomUUID } from "node:crypto";
-import { getStore } from "@netlify/blobs";
+import {
+  PERSONA_CODES,
+  addResultToSummary,
+  addVisitToSummary,
+  createAnalyticsStore,
+  getErrorMessage,
+  json,
+  updateSummarySnapshot
+} from "./_abti-analytics.mjs";
 
-const store = getStore("abti-analytics-v1");
-const ALLOWED_RESULT_CODES = new Set([
-  "PAPER",
-  "NERD",
-  "PI-er",
-  "CAFE",
-  "REF-s",
-  "TANK",
-  "SOS!",
-  "HACK",
-  "MONK",
-  "RUSH",
-  "BOSS",
-  "CHILL",
-  "STAR",
-  "COPY",
-  "IDEA",
-  "SOLO",
-  "TALK",
-  "GRIND",
-  "SLIDE",
-  "REVIEW",
-  "GRANT",
-  "PIVOT",
-  "BURN",
-  "CLEAN",
-  "QUIT",
-  "404"
-]);
-
-function json(data, init = {}) {
-  const headers = new Headers(init.headers);
-  headers.set("Cache-Control", "no-store");
-  headers.set("Content-Type", "application/json; charset=utf-8");
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers
-  });
-}
+const ALLOWED_RESULT_CODES = new Set(PERSONA_CODES);
 
 export default async (request) => {
   if (request.method !== "POST") {
@@ -49,6 +19,7 @@ export default async (request) => {
     );
   }
 
+  const store = createAnalyticsStore();
   let payload;
   try {
     payload = await request.json();
@@ -60,32 +31,46 @@ export default async (request) => {
   const id = randomUUID();
   const recordedAt = new Date(now).toISOString();
 
-  if (payload?.kind === "visit") {
-    await store.setJSON(`visits/${now}-${id}.json`, {
-      kind: "visit",
-      path: typeof payload.path === "string" ? payload.path : "/",
-      recordedAt
-    });
+  try {
+    if (payload?.kind === "visit") {
+      await updateSummarySnapshot(store, (summary) => addVisitToSummary(summary, recordedAt));
+      await store.setJSON(`visits/${now}-${id}.json`, {
+        kind: "visit",
+        path: typeof payload.path === "string" ? payload.path : "/",
+        recordedAt
+      });
 
-    return json({ ok: true });
-  }
-
-  if (payload?.kind === "result") {
-    const personaCode = typeof payload.personaCode === "string" ? payload.personaCode : "";
-    if (!ALLOWED_RESULT_CODES.has(personaCode)) {
-      return json({ error: "Unknown personaCode" }, { status: 400 });
+      return json({ ok: true });
     }
 
-    await store.setJSON(`results/${encodeURIComponent(personaCode)}/${now}-${id}.json`, {
-      kind: "result",
-      personaCode,
-      personaName: typeof payload.personaName === "string" ? payload.personaName : "",
-      special: Boolean(payload.special),
-      similarity: Number.isFinite(payload.similarity) ? payload.similarity : null,
-      recordedAt
-    });
+    if (payload?.kind === "result") {
+      const personaCode = typeof payload.personaCode === "string" ? payload.personaCode : "";
+      if (!ALLOWED_RESULT_CODES.has(personaCode)) {
+        return json({ error: "Unknown personaCode" }, { status: 400 });
+      }
 
-    return json({ ok: true });
+      await updateSummarySnapshot(store, (summary) =>
+        addResultToSummary(summary, personaCode, recordedAt)
+      );
+      await store.setJSON(`results/${encodeURIComponent(personaCode)}/${now}-${id}.json`, {
+        kind: "result",
+        personaCode,
+        personaName: typeof payload.personaName === "string" ? payload.personaName : "",
+        special: Boolean(payload.special),
+        similarity: Number.isFinite(payload.similarity) ? payload.similarity : null,
+        recordedAt
+      });
+
+      return json({ ok: true });
+    }
+  } catch (error) {
+    return json(
+      {
+        error: "Analytics write failed",
+        detail: getErrorMessage(error)
+      },
+      { status: 503 }
+    );
   }
 
   return json({ error: "Unknown analytics kind" }, { status: 400 });

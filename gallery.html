@@ -29,6 +29,38 @@
       color: #6b7084;
       font-size: 14px;
     }
+    .header-actions {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid #2a2d40;
+      background: #14162a;
+      color: #d8def7;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      border-color: #6366f1;
+      background: #1a1d35;
+    }
+    .nav-btn.primary {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      border-color: transparent;
+      color: #fff;
+    }
     .filters {
       display: flex;
       justify-content: center;
@@ -190,6 +222,8 @@
     }
     @media (max-width: 600px) {
       .header h1 { font-size: 28px; }
+      .header-actions { gap: 10px; }
+      .nav-btn { min-height: 40px; padding: 0 14px; font-size: 13px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .card-body { padding: 10px; }
       .card-code { font-size: 15px; }
@@ -201,6 +235,10 @@
   <div class="header">
     <h1>ABTI 科研人格图鉴</h1>
     <p>26 种科研人格 · 你集齐了几种？</p>
+    <div class="header-actions">
+      <a class="nav-btn primary" href="./index.html">进入测试</a>
+      <a class="nav-btn" href="./leaderboard.html">查看统计</a>
+    </div>
   </div>
 
   <div class="stats">

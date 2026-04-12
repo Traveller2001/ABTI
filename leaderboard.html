@@ -302,7 +302,7 @@
 
     .leaderboard-row {
       display: grid;
-      grid-template-columns: 68px minmax(0, 1.5fr) 110px 92px minmax(160px, 1fr);
+      grid-template-columns: 68px minmax(0, 1.5fr) minmax(210px, 232px) minmax(160px, 1fr);
       gap: 14px;
       align-items: center;
       padding: 14px 16px;
@@ -365,6 +365,13 @@
       margin-top: 2px;
       color: #b7c5df;
       font-size: 13px;
+    }
+
+    .stats-cell {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: center;
     }
 
     .count-cell,
@@ -439,11 +446,15 @@
       }
 
       .leaderboard-row {
-        grid-template-columns: 60px minmax(0, 1fr) 88px 88px;
+        grid-template-columns: 60px minmax(0, 1fr) minmax(176px, 196px);
+      }
+
+      .stats-cell {
+        gap: 10px;
       }
 
       .bar-cell {
-        grid-column: 1 / -1;
+        grid-column: 2 / -1;
       }
     }
 
@@ -463,30 +474,80 @@
         font-size: 34px;
       }
 
-      .summary-grid,
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .summary-card {
+        padding: 16px;
+      }
+
+      .summary-grid .summary-card:last-child {
+        grid-column: auto;
+      }
+
       .podium {
         grid-template-columns: 1fr;
       }
 
-      .summary-grid .summary-card:last-child,
       .podium .podium-card:last-child {
         grid-column: auto;
       }
 
       .leaderboard-row {
-        grid-template-columns: 48px minmax(0, 1fr);
-        gap: 12px;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: start;
+      }
+
+      .rank-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        font-size: 14px;
+      }
+
+      .persona-cell {
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .persona-thumb {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+      }
+
+      .persona-code {
+        font-size: 16px;
+      }
+
+      .persona-name {
+        font-size: 12px;
+      }
+
+      .stats-cell {
+        grid-column: 3;
+        gap: 8px;
+        align-self: start;
+        justify-self: end;
+      }
+
+      .bar-cell {
+        grid-column: 2 / -1;
       }
 
       .count-cell,
       .share-cell {
-        text-align: left;
+        font-size: 16px;
+        text-align: right;
       }
 
-      .count-cell,
-      .share-cell,
-      .bar-cell {
-        grid-column: 2;
+      .count-cell small,
+      .share-cell small {
+        font-size: 10px;
+        margin-top: 2px;
       }
     }
   </style>
@@ -498,7 +559,6 @@
       <div class="hero-top">
         <div class="hero-copy">
           <h1>人格排行榜</h1>
-          <p>这里统计两类数据：首页打开次数，以及用户完成测试后得到的最终人格分布。网站主体仍是静态页，数据由 Netlify Functions 写入并汇总。</p>
         </div>
 
         <div class="hero-actions">
@@ -510,7 +570,6 @@
 
       <div class="meta-row">
         <span id="updatedAt">最近更新：读取中...</span>
-        <span>统计口径：访问请求数按首页打开次数统计；人格排行按完成测验后的最终结果统计。</span>
       </div>
     </section>
 
@@ -555,16 +614,12 @@
       <div class="panel-head">
         <div>
           <h2>完整排行榜</h2>
-          <p>26 种人格全部展示，未出现的类型也会保留在榜单里。</p>
         </div>
         <div class="status" id="tableStatus">正在加载...</div>
       </div>
       <div id="leaderboardTable" class="leaderboard-table"></div>
     </section>
 
-    <div class="footnote">
-      页面使用 `/.netlify/functions/abti-analytics-track` 和 `/.netlify/functions/abti-analytics-summary`。如果这里一直显示加载失败，通常说明 Netlify 还没有安装依赖或函数还没部署上去。
-    </div>
   </div>
 
   <script>
@@ -670,13 +725,15 @@
                 <div class="persona-name">${meta.cn}</div>
               </div>
             </div>
-            <div class="count-cell">
-              ${formatNumber(item.count)}
-              <small>累计次数</small>
-            </div>
-            <div class="share-cell">
-              ${item.share}%
-              <small>结果占比</small>
+            <div class="stats-cell">
+              <div class="count-cell">
+                ${formatNumber(item.count)}
+                <small>累计次数</small>
+              </div>
+              <div class="share-cell">
+                ${item.share}%
+                <small>结果占比</small>
+              </div>
             </div>
             <div class="bar-cell">
               <div class="bar-track">
